@@ -5,8 +5,8 @@ services:
     image: traefik:v3.1
     command:
       # --- Core ---
-      - "--providers.docker.swarmMode=true"
-      - "--providers.docker.exposedByDefault=false"
+      - "--providers.swarm=true"
+      - "--providers.swarm.exposedByDefault=false"
       - "--providers.file.directory=/etc/traefik/dynamic"
       - "--providers.file.watch=true"
 
