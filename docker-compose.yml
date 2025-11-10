@@ -44,21 +44,11 @@ services:
       placement:
         constraints: [node.role == manager]
       labels:
-        - "traefik.enable=true"
-
-        # --- Dashboard Router ---
-        - "traefik.http.routers.traefik.rule=Host(`traefik.devetc.site`)"
-        - "traefik.http.routers.traefik.entrypoints=websecure"
-        - "traefik.http.routers.traefik.service=api@internal"
-        - "traefik.http.routers.traefik.tls.certresolver=myresolver"
-
-        # --- Optional Basic Auth for Dashboard ---
-        # Generate user:password with:
-        # htpasswd -nb user pass | openssl base64
-        # and replace below
-        # - "traefik.http.middlewares.auth.basicauth.users=user:$$apr1$$hash"
-        # - "traefik.http.routers.traefik.middlewares=auth"
-
+          - "traefik.enable=true"
+          - "traefik.http.routers.remix.rule=Host(`devetc.site`,`www.devetc.site`)"
+          - "traefik.http.routers.remix.entrypoints=websecure"
+          - "traefik.http.routers.remix.tls.certresolver=myresolver"
+          - "traefik.http.services.remix.loadbalancer.server.port=3000"
 volumes:
   traefik_letsencrypt:
   traefik_dynamic:
