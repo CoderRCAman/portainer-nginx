@@ -3,6 +3,9 @@ version: "3.9"
 services:
   nginx:
     image: ghcr.io/coderrcaman/nginx-proxy:latest
+    ports:                     
+      - "80:80"
+      - "443:443"
     deploy:
       mode: replicated
       replicas: 1
@@ -14,16 +17,6 @@ services:
       placement:
         constraints:
           - node.role == manager
-      # 👇 this is valid Swarm syntax for published ports
-      ports:
-        - target: 80
-          published: 80
-          protocol: tcp
-          mode: host
-        - target: 443
-          published: 443
-          protocol: tcp
-          mode: host
     networks:
       - app-net
 
