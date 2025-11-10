@@ -2,26 +2,32 @@ version: "3.9"
 
 services:
   nginx:
-    image: ghcr.io/coderrcaman/nginx-proxy:latest   # ✅ Prebuilt GHCR image
-    container_name: nginx-proxy
-    restart: unless-stopped
-
-    ports:
-      - "80:80"
-      - "443:443"
-
-    # Use internal Docker-managed volumes (no host bind)
-    volumes:
-      - nginx_conf:/etc/nginx/conf.d
-      - nginx_certs:/etc/letsencrypt
-
+    image: ghcr.io/coderrcaman/nginx-proxy:latest
+    deploy:
+      mode: replicated
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+      update_config:
+        parallelism: 1
+        order: start-first
+      endpoint_spec:
+        mode: vip
+      placement:
+        constraints: [node.role == manager]
+      # 👇 Publish ports explicitly for Swarm
+      ports:
+        - target: 80
+          published: 80
+          protocol: tcp
+          mode: host
+        - target: 443
+          published: 443
+          protocol: tcp
+          mode: host
     networks:
       - app-net
 
 networks:
   app-net:
     external: true
-
-volumes:
-  nginx_conf:
-  nginx_certs:
