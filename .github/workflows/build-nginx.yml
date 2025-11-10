@@ -25,11 +25,8 @@ jobs:
         run: echo "${{ secrets.GHCR_TOKEN }}" | docker login ${{ env.REGISTRY }} -u "${{ github.repository_owner }}" --password-stdin
 
       - name: Build Nginx Docker image
-        run: |
-          docker build \
-            -f ./Dockerfile \                         # ✅ explicitly specify your Dockerfile
-            -t ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest \
-            .
+        run: docker build -f Dockerfile -t ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest .
+
 
       - name: Push Nginx image to GHCR
         run: |
