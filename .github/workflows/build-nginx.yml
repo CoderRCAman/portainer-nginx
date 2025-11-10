@@ -1,0 +1,33 @@
+name: Build and Push Nginx Image to GHCR
+
+on:
+  push:
+    branches: [ "main", "master" ]   # choose your default branch
+  workflow_dispatch:                  # allows manual trigger
+
+permissions:
+  contents: read
+  packages: write
+
+env:
+  IMAGE_NAME: ghcr.io/${{ github.repository_owner }}/nginx-proxy:latest
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Log in to GHCR
+        run: echo "${{ secrets.GHCR_TOKEN }}" | docker login ghcr.io -u "${{ github.repository_owner }}" --password-stdin
+
+      - name: Build Nginx image
+        run: docker build -t $IMAGE_NAME .
+
+      - name: Push Nginx image to GHCR
+        run: docker push $IMAGE_NAME
+
+      # Optional: trigger Portainer redeploy
+    
