@@ -2,8 +2,8 @@ name: Build and Push Nginx Image to GHCR
 
 on:
   push:
-    branches: [ "main", "master" ]  # choose your default branch
-  workflow_dispatch:                # manual trigger
+    branches: [ "main", "master" ]
+  workflow_dispatch:
 
 permissions:
   contents: read
@@ -25,12 +25,18 @@ jobs:
         run: echo "${{ secrets.GHCR_TOKEN }}" | docker login ${{ env.REGISTRY }} -u "${{ github.repository_owner }}" --password-stdin
 
       - name: Build Nginx Docker image
-        run: docker build -f Dockerfile -t ${{ env.IMAGE_NAME }}:latest .
-
+        run: |
+          OWNER=$(echo "${{ github.repository_owner }}" | tr '[:upper:]' '[:lower:]')
+          docker build -f Dockerfile -t ${{ env.REGISTRY }}/$OWNER/${{ env.IMAGE_NAME }}:latest .
 
       - name: Push Nginx image to GHCR
         run: |
-          docker push ${{env.REGISTRY}}/${{github.repository_owner}}/${{ env.IMAGE_NAME }}:latest
+          OWNER=$(echo "${{ github.repository_owner }}" | tr '[:upper:]' '[:lower:]')
+          docker push ${{ env.REGISTRY }}/$OWNER/${{ env.IMAGE_NAME }}:latest
 
       # Optional: Trigger Portainer webhook for redeploy
-    
+      - name: Trigger Portainer redeploy
+        if: success() && secrets.PORTAINER_WEBHOOK_URL != ''
+        run: |
+          echo "Triggering Portainer redeploy..."
+          curl -X POST ${{ secrets.PORTAINER_WEBHOOK_URL }}
