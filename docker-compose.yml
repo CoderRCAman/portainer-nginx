@@ -11,11 +11,10 @@ services:
       update_config:
         parallelism: 1
         order: start-first
-      endpoint_spec:
-        mode: vip
       placement:
-        constraints: [node.role == manager]
-      # 👇 Publish ports explicitly for Swarm
+        constraints:
+          - node.role == manager
+      # 👇 this is valid Swarm syntax for published ports
       ports:
         - target: 80
           published: 80
